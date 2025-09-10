@@ -26,3 +26,5 @@ settings.py berfungsi sebagai file konfigurasi utama untuk sebuah proyek Django.
 Migrasi database django bekerja dalam 2 langkah. Setelah mengubah model di models.py, untuk menerapkan ke database, jalankan  python manage.py makemigrations di cmd. Perintah ini akan membuat file migrasi yang berisi instruksi untuk mempersiapkan perubahan skema model agar sesuai dengan database lokal Django. Untuk menerapkannya, kemudian jalankan perintah python manage.py migrate yang mengambil file migrasi yang telah dibuat sebelumnya dan menerapkan skema model yang baru ke dalam database Django.
 
 Menurut saya, alasan django dijadikan permulaan pembelajaran pengembangan perangkat lunak adalah karena framework ini adalah framework paling stabil dari framework lainnya.  Berdasarkan benchmark https://sharkbench.dev/web, stabilitas django mencapai 93.76%. Django juga menggunakan arsitektur MVT yang memudahkan mahasiswa untuk memahami hubungan model dengan template dengan mudah. Familiaritas dengan bahasa python yang dikenal sebagai bahasa high level juga mendukung proses pemahaman yang lebih mudah.
+
+Tidak ada, asdos sangat helpful :D
