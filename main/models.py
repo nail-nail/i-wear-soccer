@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.exceptions import ValidationError
+import uuid
 
 def validate_rating(value):
     if value < 1.0 or value > 5.0 :
@@ -14,11 +15,12 @@ class Shop(models.Model):
         ('jacket', 'Jacket'),
     ]
     
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField()
     price = models.IntegerField()
     description = models.TextField()
     thumbnail = models.URLField(blank=True, null=True)
-    category = models.CharField()
+    category = models.CharField(choices=CATEGORY_CHOICES)
     is_featured = models.BooleanField(default=False)
     rating = models.DecimalField(max_digits=2, decimal_places=1, validators=[validate_rating])
     stock = models.IntegerField()

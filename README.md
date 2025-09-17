@@ -1,5 +1,8 @@
 Tautan menuju PWS: https://naila-khadijah-i-wear-soccer.pbp.cs.ui.ac.id/
 
+
+<details>
+<summary>Tugas 2</summary>
 Step by step mengerjakan checklist: 
 1. Untuk membuat proyek Django yang baru, saya membuat terlebih dahulu direktori baru bernama i-wear-soccer (nama proyek saya) lalu membuka command prompt di dalam direktori tersebut. Kemudian, saya membuat virtual environment dengan menjalankan perintah py -m venv env dan mengaktifkannya dengan menjalankan perintah env\Scripts\activate. Saya kemudian membuat file requirements.txt di dalam direktori yang berisi dependencies yang ingin saya install dan gunakan dalam pembuatan proyek dn menginstallnya dengan menjalankan pip install -r requirements.txt. Saya kemudian melakukan inisialisasi proyek Django dengan menjalankan: django-admin startproject football_news . 
 2. Untuk membuat aplikasi main pada proyek, saya menjalankan perintah python manage.py startapp main di cmd dan menambahkan string 'main' sebagai elemen terakhir list INSTALLED_APPS di settings.py
@@ -28,3 +31,91 @@ Migrasi database django bekerja dalam 2 langkah. Setelah mengubah model di model
 Menurut saya, alasan django dijadikan permulaan pembelajaran pengembangan perangkat lunak adalah karena framework ini adalah framework paling stabil dari framework lainnya.  Berdasarkan benchmark https://sharkbench.dev/web, stabilitas django mencapai 93.76%. Django juga menggunakan arsitektur MVT yang memudahkan mahasiswa untuk memahami hubungan model dengan template dengan mudah. Familiaritas dengan bahasa python yang dikenal sebagai bahasa high level juga mendukung proses pemahaman yang lebih mudah.
 
 Tidak ada, asdos sangat helpful :D
+</details>
+
+---
+
+# TUGAS 3
+
+## Mengapa butuh _data delivery_ dalam pengimplementasian sebuah platform?
+
+Data delivery penting untuk diimplementasikan agar komunikasi antara client dan server lancar. Dengan mengimplementasikan data delivery, kita dapat mengirim berbagai komponen yang membangun platform seperti file HTML, CSS, dan JavaScript. Data delivery juga membantu platform dinamis untuk mengirimkan raw data dalam format JSON atau XML.
+
+## Mana yang lebih baik antara XML dan JSON? Mengapa JSON lebih populer dibandingkan XML?
+
+Dalam konteks web development, menurut saya, JSON merupakan pilihan yang lebih baik dari XML. Alasan pertama adalah karena sintaksnya yang simpel yaitu pasangan key-value dengan bracket seperti dictionary dibandingkan XML yang lebih padat. JSON juga membedakan data type seperti string, angka, dan lainnya sementara XML memperlakukan semua data sebagai teks. Parsing JSON juga sangat efisien dan _computing cost_-nya lebih murah dibanding Parsing XML. JSON lebih populer dibanding XML karena merupakan standar format data jika menggunakan REST API (Representational State Transfer), dimana REST API banyak digunakan pada program dan aplikasi dinamis. Selain itu, JSON juga memiliki ukuran payload minimal sehingga banyak diandalkan oleh developer.
+
+## Jelaskan fungsi dari method `is_valid()` pada form Django dan mengapa kita membutuhkan method tersebut?
+
+Method is_valid() menjalankan validasi data yang diinput oleh user ke dalam form, apakah sesuai dengan spesifikasi fieldnya yang sudah diatur di model, seperti panjang, berbentuk angka atau huruf, dan lainnya. Method ini dibutuhkan agar tidak terjadi error walaupun input yang diberikan user ke form tidak sesuai dengan spesifikasi data yang seharusnya.
+
+## Mengapa kita membutuhkan `csrf_token` saat membuat form di Django? Apa yang dapat terjadi jika kita tidak menambahkan `csrf_token` pada form Django? Bagaimana hal tersebut dapat dimanfaatkan oleh penyerang?
+
+`csrf_token` dibutuhkan ketika membuat form di django karena mekanisme CSRF (Cross-Site Request Forgery) yang built-in membutuhkan token unik per sesi agar server bisa memastikan bahwa request/POST berasal dari halaman/form aplikasi kita dan bukan dari situs jahat. Jika kita tidak menambahkan `csrf_token`, proses verifikasi token ini akan dilewati sehingga keaslian request tidak bisa diketahui. Penyerang bisa memanfaatkan browser korban yang otomatis mengirim cookie otentikasi untuk mengirim request berbahaya lewat halaman tersembunyi dan bisa melakukan tindakan atas nama pengguna tanpa persetujuan mereka.
+
+## Step by step mengerjakan checklist
+- #### Menambahkan fungsi show_xml dan show_json ke views.py
+Fungsi-fungsi ini menerima parameter request dan mereturn HttpResponse berupa data yag sudah diserialisasi menjadi JSON. Fungsi ini mengembalikan semua objek produk yang ada pada web.
+
+- #### Menambahkan fungsi show_xml_by_id dan show_json_by_id ke views.py
+Fungsi-fungsi ini menerima parameter request dan id produk dan mereturn HttpResponse berupa data yag sudah diserialisasi menjadi JSON. Fungsi ini mengembalikan objek produk tertentu yang ada pada web. Saya juga menambahkan try-except untuk verifikasi apakah produk dengan ID tersebut benar benar ada.
+
+- #### Menambahkan routing untuk show_xml, show_json,  show_xml_by_id dan show_json_by_id di Views.py
+Menambahkan routing endpoint `json/` ke fungsi show_json, `xml/` ke fungsi show_xml, `xml/<str:news_id>/` ke fungsi show_xml_by_id, dan `json/<str:news_id>/` ke fungsi show_json_by_id dengan menambahkan elemen  path ke list urlpatterns.
+
+- #### Membuat halaman yang menampilkan data objek model yang memiliki tombol "Add" yang akan redirect ke halaman `form`, serta tombol "Detail" pada setiap data objek model yang akan menampilkan halaman detail objek.
+  - Membuat direktori templates level projek dan menambahkan base.html sebagai template dasar yang berisi:
+	```html{% load static %}
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+	    <meta charset="UTF-8" />
+	    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	    {% block meta %} {% endblock meta %}
+	</head>
+
+	<body>
+	    {% block content %} {% endblock content %}
+	</body>
+	</html>
+	```
+  - Menambahkan string `templates` ke key `DIRS` variabel `TEMPLATES` yang ada di settings.py agar terdeteksi sebagai kerangka utama.
+  - Menambahkan button `Add Product` ke main.html yang ada di templates level aplikasi. Button akan mengarah ke fungsi add_product di views.py.Mengecek apakah ada objek di product_list dan jika ada, menampilkan informasi generalnya dan menambahkan button `Detail` yang akan mengarahkan ke `product_detail`.
+ - #### Membuat halaman `form` untuk menambahkan objek model pada app sebelumnya.
+ Membuat file forms.py di direktori main yang mengimpor objek Shop dan ModelForm, berisi class `ProductForm` (subclass ModelForm) yang menggunakan shop sebagai model dan field: "name", "price", "description", "thumbnail", "is_featured", "category", "rating", "stock". Kemudian, menambahkan impor NewsForm, redirect, dan get_object_or_404 di views.py. Membuat fungsi add_product yang menambahkan produk baru jika input valid dan show_product yang menampilkan detail deskripsi produk jika produk dengan id tersebut ada. Menambahkan routing aplikasi path `add_product/` dan `/product/<str:id>/`  ke urlpatterns di urls.py di direktori main.
+ - #### Membuat halaman yang menampilkan detail dari setiap data objek mode
+Membuat berkas product_detail.html di templates aplikasi yang berisi deskripsi produk dan detail harga, stok, rating, dll dan sebuah tombol back to produck list yang akan mengarahkan kembali ke aplikasi main:
+```html
+{% extends 'base.html' %}
+{% block content %}
+<p><a href="{% url 'main:show_main' %}">
+<button>← Back to product List</button></a></p>
+<h1>{{ product.title }}</h1>
+  <p><b>{{ product.get_category_display }}</b>{% if product.is_featured %} | 
+    <b>Featured</b>{% endif %} | Price: Rp{{ product.price}} 
+    | Stock: {{ product.stock }} | Rating: {{product.rating}} ⭐ </p>
+{% if product.thumbnail %}
+<img src="{{ product.thumbnail }}" alt="product thumbnail" width="300">
+<br /><br />
+{% endif %}
+<p>{{ product.description }}</p>
+{% endblock content %}
+```
+
+## Feedback
+
+Tidak ada :), asdos sangat helpful. Terima kasih bimbingannya 🙏
+
+## Screenshot Postman
+
+- #### show_json
+https://drive.google.com/file/d/10xRQI310lbT2HZyedSemOZTnF4lAEpE-/view?usp=sharing
+
+- #### show_xml
+https://drive.google.com/file/d/17DluTv4-HiAgZcm5rjo6dhqnnZzX3Y-h/view?usp=sharing
+
+- #### show_json_by_id
+https://drive.google.com/file/d/1ZWANGZHUK1bxzKwTRmB0Ys0IJolsqwgL/view?usp=sharing
+
+- #### show_xml_by_id
+https://drive.google.com/file/d/1sZ7JYPD5qTrq_VdEpLox7H9iJY8GVhQV/view?usp=sharing
