@@ -1,5 +1,7 @@
 from django.db import models
 from django.core.exceptions import ValidationError
+from django.contrib.auth.models import User
+
 import uuid
 
 def validate_rating(value):
@@ -14,7 +16,7 @@ class Shop(models.Model):
         ('pants', 'Pants'),
         ('jacket', 'Jacket'),
     ]
-    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True) # tambahkan ini
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField()
     price = models.IntegerField()
@@ -41,3 +43,4 @@ class Shop(models.Model):
     def increment_buy(self):
         self.purchase_count += 1
         self.save()
+

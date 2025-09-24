@@ -1,39 +1,94 @@
+import datetime
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib import messages
 from django.http import HttpResponse
 from django.core import serializers
 from main.models import Shop
 from main.forms import ProductForm
 
+
+@login_required(login_url='/login')
 def show_main(request):
-    product_list = Shop.objects.all()
+    filter_type = request.GET.get("filter", "all")  # default 'all'
+
+    if filter_type == "all":
+        product_list = Shop.objects.all()
+    else:
+        product_list = Shop.objects.filter(user=request.user)
     context = {
         'app': 'I WEAR SOCCER',
         'name': 'Naila Khadijah',
         'class' : 'PBP C',
-        'product_list': product_list
+        'product_list': product_list,
+        'last_login' : request.COOKIES.get('last_login', 'Never')
     }
 
     return render(request, "main.html", context)
 # Create your views here.
 
+@login_required(login_url='/login')
 def add_product(request):
     form = ProductForm(request.POST or None)
 
     if form.is_valid() and request.method == "POST":
-        form.save()
+        product_entry = form.save(commit = False)
+        product_entry.user = request.user
+        product_entry.save()
         return redirect('main:show_main')
 
     context = {'form': form}
     return render(request, "add_product.html", context)
 
+@login_required(login_url='/login')
 def show_product(request, id):
     product = get_object_or_404(Shop, pk=id)
 
     context = {
         'product': product
     }
-
     return render(request, "product_detail.html", context)
+
+def register(request):
+    form = UserCreationForm()
+
+    if request.method == "POST":
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Your account has been successfully created!')
+            return redirect('main:login')
+    context = {'form':form}
+    return render(request, 'register.html', context)
+
+def login_user(request):
+   if request.method == 'POST':
+      form = AuthenticationForm(data=request.POST)
+
+      if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+            response = HttpResponseRedirect(reverse("main:show_main"))
+            response.set_cookie('last_login', str(datetime.datetime.now()))
+            return response
+
+   else:
+      form = AuthenticationForm(request)
+   context = {'form': form}
+   return render(request, 'login.html', context)
+
+def logout_user(request):
+    logout(request)
+    response = HttpResponseRedirect(reverse('main:login'))
+    response.delete_cookie('last_login')
+    return response
+
+
 def show_xml(request):
      product_list = Shop.objects.all()
      xml_data = serializers.serialize("xml", product_list)
