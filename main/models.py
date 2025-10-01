@@ -26,6 +26,7 @@ class Shop(models.Model):
     is_featured = models.BooleanField(default=False)
     rating = models.DecimalField(max_digits=2, decimal_places=1, validators=[validate_rating])
     stock = models.IntegerField()
+    purchase_count = models.IntegerField(default=0)
     
     
     def __str__(self):

@@ -1,0 +1,59 @@
+{% load static %}
+<article class="bg-white rounded-lg border border-gray-200 hover:shadow-lg transition-shadow duration-300 overflow-hidden snap-start">
+
+    <div class="aspect-square relative overflow-hidden bg-gray-100">
+        {% if product.thumbnail %}
+            <img src="{{ product.thumbnail }}" alt="{{ product.name }}" class="w-full h-full object-cover" loading="lazy">
+        {% else %}
+            <div class="w-full h-full grid place-items-center text-gray-400 text-sm">no image</div>
+        {% endif %}
+
+        <div class="absolute top-3 left-3">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-[10px] font-medium bg-green-600 text-white">
+                {{ product.get_category_display }}
+            </span>
+        </div>
+
+        <div class="absolute top-3 right-3 flex space-x-2">
+            {% if product.is_featured %}
+                <span class="inline-flex items-center px-2 py-1 rounded text-[10px] font-medium bg-yellow-100 text-yellow-800">Featured</span>
+            {% endif %}
+            {% if product.is_recommended %}
+                <span class="inline-flex items-center px-2 py-1 rounded text-[10px] font-medium bg-emerald-100 text-emerald-800">Recommended</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="p-4">
+        <h3 class="text-base font-semibold text-gray-900 mb-1 line-clamp-2 leading-tight">
+            <a href="{% url 'main:show_product' product.id %}" class="hover:text-green-600 transition-colors">{{ product.name }}</a>
+        </h3>
+
+        <div class="text-xs text-gray-500 mb-2">by <span class="font-medium text-gray-700">{{ product.user.username }}</span></div>
+
+        <div class="flex items-center gap-1 mb-3" aria-label="Rating {{ product.rating }} out of 5">
+            {% with full=product.rating|floatformat:1 %}
+                {% for i in "12345" %}
+                    {% if forloop.counter <= full|floatformat:0 %}
+                        <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.802 2.035a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.802-2.035a1 1 0 00-1.176 0l-2.802 2.035c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.88 8.72c-.783-.57-.38-1.81.588-1.81H6.93a1 1 0 00.95-.69l1.17-3.292z"/></svg>
+                    {% else %}
+                        <svg class="w-4 h-4 opacity-30" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.802 2.035a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.802-2.035a1 1 0 00-1.176 0l-2.802 2.035c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.88 8.72c-.783-.57-.38-1.81.588-1.81H6.93a1 1 0 00.95-.69l1.17-3.292z"/></svg>
+                    {% endif %}
+                {% endfor %}
+            {% endwith %}
+            <span class="text-xs text-gray-600 ml-1">{{ product.rating }} ⭐</span>
+        </div>
+
+        <div class="flex items-center justify-between">
+            <div class="text-sm font-semibold text-gray-900">Rp{{ product.price }}</div>
+            <a href="{% url 'main:show_product' product.id %}" class="text-green-600 hover:text-green-700 text-sm font-medium">Detail →</a>
+        </div>
+
+        {% if user.is_authenticated and product.user == user %}
+            <div class="flex items-center justify-end gap-3 pt-3 border-t border-gray-100 mt-3">
+                <a href="{% url 'main:edit_product' product.id %}" class="text-gray-600 hover:text-gray-800 text-xs">Edit</a>
+                <a href="{% url 'main:delete_product' product.id %}" class="text-red-600 hover:text-red-700 text-xs">Delete</a>
+            </div>
+        {% endif %}
+    </div>
+</article>

@@ -200,3 +200,33 @@ Untuk session cookie, kelebihannya adalah lebih aman karena hanya disimpan di me
 ## Apakah penggunaan cookies aman secara default dalam pengembangan web, atau apakah ada risiko potensial yang harus diwaspadai? Bagaimana Django menangani hal tersebut?
 
 Penggunaan cookie tidak aman secara default .  Resiko potensialnya adalah Cross-site scripting (XSS) dan pemalsuan sesi. Django menangani resiko ini dengan tidak menyimpan data sesitif langsung di dalam cookie, tetapi di server side session, dimana cookie di browser hanya berisi ID dari sesi yang kemudian digunakan untuk mengambil data sesi yang disimpan dengan aman di database server. Django juga menyediakan perlindungan bawaan terhadap XSS dan CSRF secara default, dan menawarkan pengaturan seperti SESSION_COOKIE_SECURE untuk memastikan cookie hanya dikirim melalui https yang aman.
+
+# Tugas 3
+## Step by Step cheklist
+- ####  Implementasikan fungsi untuk menghapus dan mengedit product
+Menambahkan fungsi edit_product dan delete_product di views.py yang menerima parameter request dan id dari product. Menambahkan impor edit_product dan delete_product di urls.py kemudian menambahkan patrh yang sesuai untuk keduanya.
+
+- ####  Kustomisasi halaman login, register, tambah product, edit product, dan detail product semenarik mungkin
+Menambahkan static/css/global.css kemudian menghubungkan css ke base.html. Mengubah halaman login, register, tambah product, edit product, dan detail product dengan css yang sudah distyle.
+
+- #### Kustomisasi halaman daftar product menjadi lebih menarik dan responsive dan menambahkan edit dan delete button ke card_product.
+Membuat product_card.html yang menunjukkan rating, harga, nama barang, seller, dan thumbnail kemudian menambahkan ke main.html jika ada produk maka show dengan card tapi jika tidak, maka tampilkan foto no-products.png. Menambahkan validasi if user.is_authenticated and product.user == user untuk mengetahui apakah user adalah penjual product kemudian menambahkan button edit dan delete jika iya.
+
+- #### Membuat Navigation Bar responsive
+
+## Jika terdapat beberapa CSS selector untuk suatu elemen HTML, jelaskan urutan prioritas pengambilan CSS selector tersebut!
+Prioritas ditentukan berdasarkan specifity dalam kasus tersebutm dengan yang tertinggi inline styles -> ID selector yang diawali dengan # -> class selector yang diawali dengan . -> element selectors yang diawali dengan tag html seperti h1 atau p.Jika terdapat konflik antara 2 aturan dengan spesifitas yang sama, aturan yang muncul terakhir dalam urutan kode baik dalam satu stylesheet ataupun beberapa yang dilink akan diterapkan.
+
+## Mengapa responsive design menjadi konsep yang penting dalam pengembangan aplikasi web? Berikan contoh aplikasi yang sudah dan belum menerapkan responsive design, serta jelaskan mengapa!
+
+Responsive design penting karena memastikan sebuah web dapat ditampilkan dengan baik di berbagai perangkat dengan ukuran layar yang berbeda. Tujuannya adalah untuk memisahkan desain dari konten dan mendukung aksesibilitas serta daya tangkap desain. Contoh aplikasi yang menerapkan responsive design adalah The New York Times yang layoutnya menyesuaikan per perangkat, dan contoh yang tidak responsif adalah siakng karena jika dibuka di mobile layoutnya sama dengan layout desktop.
+
+##  Jelaskan perbedaan antara margin, border, dan padding, serta cara untuk mengimplementasikan ketiga hal tersebut!
+
+Padding adalah ruang transparan di antara konten dan bordernya. Margin adalah ruang di luar border yang memisahkan elemen tersebut dari elemen lainnya. Border adalah garis antara padding dan margin yang bisa diatur ketebalan, gaya, dan warnanya untuk untuk membingkai konten elemen. Cara mengimplementasikannya adalah mendeklarasikan propertinya di dalam selector html yang ingin di style (con: padding: 10px;, margin:15px;, border: 1px solid black;)
+
+## Jelaskan konsep flex box dan grid layout beserta kegunaannya!
+
+Flexbox adalah layout mode baru dalam CSS3 dan merupakan bagian dari standar terbaru CSS yang kompatibel dengan versi sebelumnya. Fungsinya adalah untuk mengatur elemen-elemen dalam sebuah halaman. Grid layout adalah sistem tata letak 2 dimensi berbasis grid yang berfngsi untuk membagi halaman menjadi beberapa wilayah utama atau hubungan antara bagian-baguan elemen dalam hal ukuran, posisi, dan lapisan.
+
+
