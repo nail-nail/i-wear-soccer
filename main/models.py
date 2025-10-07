@@ -16,7 +16,7 @@ class Shop(models.Model):
         ('pants', 'Pants'),
         ('jacket', 'Jacket'),
     ]
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True) # tambahkan ini
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True) 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField()
     price = models.IntegerField()
@@ -26,6 +26,7 @@ class Shop(models.Model):
     is_featured = models.BooleanField(default=False)
     rating = models.DecimalField(max_digits=2, decimal_places=1, validators=[validate_rating])
     stock = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
     purchase_count = models.IntegerField(default=0)
     
     

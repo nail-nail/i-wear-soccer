@@ -1,16 +1,18 @@
 import datetime
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
-from django.http import HttpResponse
 from django.core import serializers
 from main.models import Shop
 from main.forms import ProductForm
+
+
 
 
 @login_required(login_url='/login')
@@ -35,15 +37,30 @@ def show_main(request):
 @login_required(login_url='/login')
 def add_product(request):
     form = ProductForm(request.POST or None)
+    is_ajax = request.headers.get("X-Requested-With") == "XMLHttpRequest"
 
-    if form.is_valid() and request.method == "POST":
-        product_entry = form.save(commit = False)
-        product_entry.user = request.user
-        product_entry.save()
-        return redirect('main:show_main')
+    if request.method == "POST":
+        if form.is_valid():
+            product_entry = form.save(commit=False)
+            product_entry.user = request.user
+            product_entry.save()
 
-    context = {'form': form}
-    return render(request, "add_product.html", context)
+            if is_ajax:
+                return JsonResponse({
+                    "success": True,
+                    "message": "Product created successfully.",
+                    "product": serialize_product(product_entry),
+                })
+            return redirect("main:show_main")
+
+        if is_ajax:
+            return JsonResponse(
+                {"success": False, "errors": form.errors},
+                status=400,
+            )
+
+    return render(request, "add_product.html", {"form": form})
+
 
 @login_required(login_url='/login')
 def show_product(request, id):
@@ -59,34 +76,87 @@ def register(request):
 
     if request.method == "POST":
         form = UserCreationForm(request.POST)
+        is_ajax = request.headers.get("X-Requested-With") == "XMLHttpRequest"
+
         if form.is_valid():
             form.save()
-            messages.success(request, 'Your account has been successfully created!')
-            return redirect('main:login')
+            if is_ajax:
+                return JsonResponse({"success": True, "redirect_url": reverse("main:login")})
+            messages.success(request, "Your account has been successfully created!")
+            return redirect("main:login")
+
+        if is_ajax:
+            return JsonResponse(
+                {"success": False,
+                "errors": form.errors,
+                "non_field_errors": form.non_field_errors()},
+                status=400,
+            )
+
     context = {'form':form}
     return render(request, 'register.html', context)
 
 def login_user(request):
-   if request.method == 'POST':
-      form = AuthenticationForm(data=request.POST)
+    if request.method == "POST":
+        form = AuthenticationForm(data=request.POST)
+        is_ajax = request.headers.get("X-Requested-With") == "XMLHttpRequest"
 
-      if form.is_valid():
+        if form.is_valid():
             user = form.get_user()
             login(request, user)
-            response = HttpResponseRedirect(reverse("main:show_main"))
-            response.set_cookie('last_login', str(datetime.datetime.now()))
+            if is_ajax:
+                response = JsonResponse({"success": True, "redirect_url": reverse("main:show_main")})
+            else:
+                response = HttpResponseRedirect(reverse("main:show_main"))
+            response.set_cookie("last_login", str(datetime.datetime.now()))
             return response
 
-   else:
-      form = AuthenticationForm(request)
-   context = {'form': form}
-   return render(request, 'login.html', context)
+        if is_ajax:
+            return JsonResponse(
+                {"success": False,
+                "errors": form.errors,
+                "non_field_errors": form.non_field_errors()},
+                status=400,
+            )
+    else:
+        form = AuthenticationForm(request)
+
+    context = {'form': form}
+    return render(request, 'login.html', context)
 
 def logout_user(request):
+    is_ajax = request.headers.get("X-Requested-With") == "XMLHttpRequest"
     logout(request)
-    response = HttpResponseRedirect(reverse('main:login'))
+    redirect_url = reverse('main:login')
+    if is_ajax:
+        response = JsonResponse({"success": True, "redirect_url": redirect_url})
+    else:
+        response = HttpResponseRedirect(redirect_url)
     response.delete_cookie('last_login')
     return response
+
+
+
+@login_required(login_url='/login')
+@require_POST
+@csrf_exempt
+def add_product_entry_ajax(request):
+    form = ProductForm(request.POST, request.FILES)
+    if not form.is_valid():
+        return JsonResponse({"success": False, "errors": form.errors}, status=400)
+
+    product = form.save(commit=False)
+    product.user = request.user
+    product.save()
+
+    return JsonResponse(
+        {
+            "success": True,
+            "message": "Product created successfully.",
+            "product": serialize_product(product),
+        },
+        status=201,
+    )
 
 
 def show_xml(request):
@@ -96,8 +166,9 @@ def show_xml(request):
 
 def show_json(request):
     product_list = Shop.objects.all()
-    json_data = serializers.serialize("json", product_list)
-    return HttpResponse(json_data, content_type="application/json")
+    data = [serialize_product(product) for product in product_list]
+    return JsonResponse(data, safe=False)
+
 
 def show_xml_by_id(request, product_id):
    try:
@@ -109,26 +180,68 @@ def show_xml_by_id(request, product_id):
    
 def show_json_by_id(request, product_id):
    try:
-       product_item = Shop.objects.get(pk=product_id)
-       json_data = serializers.serialize("json", [product_item])
-       return HttpResponse(json_data, content_type="application/json")
+        product = Shop.objects.get(pk=product_id)
+        data = serialize_product(product)
+        return JsonResponse(data)
    except Shop.DoesNotExist:
-       return HttpResponse(status=404)
+       return JsonResponse({'detail': 'Not found'}, status=404)
    
+@login_required(login_url='/login')
 def edit_product(request, id):
-    product = get_object_or_404(Shop, pk=id)
+    product = get_object_or_404(Shop, pk=id, user=request.user)
     form = ProductForm(request.POST or None, instance=product)
-    if form.is_valid() and request.method == 'POST':
-        form.save()
-        return redirect('main:show_main')
+    is_ajax = request.headers.get("X-Requested-With") == "XMLHttpRequest"
 
-    context = {
-        'form': form
+    if request.method == "POST":
+        if form.is_valid():
+            updated_product = form.save()
+
+            if is_ajax:
+                return JsonResponse({
+                    "success": True,
+                    "message": "Product updated successfully.",
+                    "product": serialize_product(updated_product),
+                })
+            return redirect("main:show_main")
+
+        if is_ajax:
+            return JsonResponse(
+                {"success": False, "errors": form.errors},
+                status=400,
+            )
+
+    return render(request, "edit_product.html", {"form": form, "product": product})
+
+
+@login_required(login_url='/login')
+def delete_product(request, id):
+    product = get_object_or_404(Shop, pk=id, user=request.user)
+    is_ajax = request.headers.get("X-Requested-With") == "XMLHttpRequest"
+
+    if request.method == "POST":
+        product.delete()
+        if is_ajax:
+            return JsonResponse({"success": True, "deleted_id": id})
+        return HttpResponseRedirect(reverse('main:show_main'))
+
+    if is_ajax:
+        return JsonResponse({"success": False, "message": "Unsupported method."}, status=405)
+
+    return HttpResponseRedirect(reverse('main:show_main'))
+
+def serialize_product(product):
+    return {
+        "id": str(product.id),
+        "name": product.name,
+        "price": product.price,
+        "description": product.description,
+        "category": product.category,
+        "thumbnail": product.thumbnail,
+        "purchase_count": product.purchase_count,
+        "is_featured": product.is_featured,
+        "rating": float(product.rating) if getattr(product, "rating", None) is not None else None,
+        "stock": product.stock,
+        "created_at": product.created_at.isoformat() if getattr(product, 'created_at', None) else None,
+        "user_id": product.user_id,
     }
 
-    return render(request, "edit_product.html", context)
-
-def delete_product(request, id):
-    product = get_object_or_404(Shop, pk=id)
-    product.delete()
-    return HttpResponseRedirect(reverse('main:show_main'))

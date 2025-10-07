@@ -201,7 +201,7 @@ Untuk session cookie, kelebihannya adalah lebih aman karena hanya disimpan di me
 
 Penggunaan cookie tidak aman secara default .  Resiko potensialnya adalah Cross-site scripting (XSS) dan pemalsuan sesi. Django menangani resiko ini dengan tidak menyimpan data sesitif langsung di dalam cookie, tetapi di server side session, dimana cookie di browser hanya berisi ID dari sesi yang kemudian digunakan untuk mengambil data sesi yang disimpan dengan aman di database server. Django juga menyediakan perlindungan bawaan terhadap XSS dan CSRF secara default, dan menawarkan pengaturan seperti SESSION_COOKIE_SECURE untuk memastikan cookie hanya dikirim melalui https yang aman.
 
-# Tugas 3
+# Tugas 5
 ## Step by Step cheklist
 - ####  Implementasikan fungsi untuk menghapus dan mengedit product
 Menambahkan fungsi edit_product dan delete_product di views.py yang menerima parameter request dan id dari product. Menambahkan impor edit_product dan delete_product di urls.py kemudian menambahkan patrh yang sesuai untuk keduanya.
@@ -228,5 +228,28 @@ Padding adalah ruang transparan di antara konten dan bordernya. Margin adalah ru
 ## Jelaskan konsep flex box dan grid layout beserta kegunaannya!
 
 Flexbox adalah layout mode baru dalam CSS3 dan merupakan bagian dari standar terbaru CSS yang kompatibel dengan versi sebelumnya. Fungsinya adalah untuk mengatur elemen-elemen dalam sebuah halaman. Grid layout adalah sistem tata letak 2 dimensi berbasis grid yang berfngsi untuk membagi halaman menjadi beberapa wilayah utama atau hubungan antara bagian-baguan elemen dalam hal ukuran, posisi, dan lapisan.
+
+
+
+# Tugas 6
+
+## Apa perbedaan antara synchronous request dan asynchronous request?
+Sinkronus memiliki pola click-wait-refresh dimana user harus menunggu tiap halaman dimuat ulang secara full setiap melakukan/dilakukan suatu aksi, sementara asinkronus seperti AJAX dan fetch menjalankan request di background sehingga halaman tetap interaktif dan hanya bagian yang relevan yang diperbarui dengan demikian membuat UI terasa lebih cepat.
+
+## Bagaimana AJAX bekerja di Django (alur request–response)?
+
+Umumnya, alurnya seperti berikut: suatu event terjadi di browser, JS fetch() mengirim request dan CSRF token ke view django yang kemudian diproses dan dikembalikan sebuah JsonResponse yang menampilkan status (sukses/error etc) dan data jika ada, kemudian JS membaca response dan mengupdate DOM tanpa full reload.
+
+##  Apa keuntungan menggunakan AJAX dibandingkan render biasa di Django?
+
+AJAX memberi UI yang lebih responsif (partial update, tidak kehilangan scroll/state), mengurangi bandwidth karena kirim terima data yang diperlukan saja, dan memperbaiki perceived performance karena pengguna tidak harus mengulang-ulang refresh halaman.
+
+## Bagaimana cara memastikan keamanan saat menggunakan AJAX untuk fitur Login dan Register di Django?
+
+Aktifkan proteksi CSRF dan kirim token pada setiap POST AJAX dan gunakan HTTPS. Jika ada error, kembalikan pesan yang generik untuk menghindari bocornya detail auth. Aktifkan juga rate-limiting untuk mencegah bruteforce. Terakhir, validasi & sanitize input untuk cegah XSS/IDOR.
+
+## Bagaimana AJAX mempengaruhi pengalaman pengguna (User Experience) pada website?
+
+AJAX meningkatkan UX karena membuat interaksi terasa instan seperti menampilkan validasi/toast tanpa ganti halaman, menjaga konteks pengguna (scroll dan state), dan membuat pola loading lebih halus dengan spinner/skeleton saat data diambil di background. Dengan begitu, aplikasi terasa lebih smooth dan modern dibanding pola sinkronus yang mengharuskan full reload.
 
 

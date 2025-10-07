@@ -1,4 +1,4 @@
-{% load static %}
+﻿{% load static %}
 <article class="bg-white rounded-lg border border-gray-200 hover:shadow-lg transition-shadow duration-300 overflow-hidden snap-start">
 
     <div class="aspect-square relative overflow-hidden bg-gray-100">
@@ -41,12 +41,12 @@
                     {% endif %}
                 {% endfor %}
             {% endwith %}
-            <span class="text-xs text-gray-600 ml-1">{{ product.rating }} ⭐</span>
+            <span class="text-xs text-gray-600 ml-1">{{ product.rating }} &#9733;</span>
         </div>
 
         <div class="flex items-center justify-between">
             <div class="text-sm font-semibold text-gray-900">Rp{{ product.price }}</div>
-            <a href="{% url 'main:show_product' product.id %}" class="text-green-600 hover:text-green-700 text-sm font-medium">Detail →</a>
+            <a href="{% url 'main:show_product' product.id %}" class="text-green-600 hover:text-green-700 text-sm font-medium">Detail &rarr;</a>
         </div>
 
         {% if user.is_authenticated and product.user == user %}
