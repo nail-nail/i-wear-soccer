@@ -1,0 +1,13 @@
+<nav class="footer-nav fixed bottom-0 left-0 w-full z-50">
+  <div class="footer-glow" aria-hidden="true"></div>
+  <div class="footer-surface">
+    <div class="max-w-7xl mx-auto px-6 py-4">
+      {% if user.is_authenticated %}
+        <div class="space-y-1 text-center sm:text-left">
+          <div class="text-sm font-semibold text-gray-900">{{ name|default:user.username }}</div>
+          <div class="text-xs text-gray-500 uppercase tracking-wide">{{ npm|default:"Student" }} &bullet; {{ class|default:"Class" }}</div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</nav>

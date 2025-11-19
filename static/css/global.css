@@ -45,3 +45,37 @@
     border-color: #16a34a;
     box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
 }
+
+.footer-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    isolation: isolate;
+    overflow: visible;
+}
+
+.footer-surface {
+    position: relative;
+    background: rgba(255, 255, 255, 0.94);
+    border-top: 1px solid #e5e7eb;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 -16px 48px -28px rgba(15, 23, 42, 0.35);
+    pointer-events: auto;
+}
+
+.footer-glow {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: clamp(420px, 55vw, 960px);
+    height: 220px;
+    transform: translate3d(-50%, 52%, 0);
+    background: radial-gradient(60% 65% at 50% 0%, rgba(220, 38, 38, 0.55), rgba(220, 38, 38, 0));
+    background-repeat: no-repeat;
+    filter: blur(60px);
+    opacity: 0.9;
+    pointer-events: none;
+    z-index: -1;
+}

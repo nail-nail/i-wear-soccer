@@ -9,11 +9,65 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core import serializers
+from django.utils.html import strip_tags
 from main.models import Shop
 from main.forms import ProductForm
+import json
+import requests
+from decimal import Decimal, InvalidOperation
 
 
 
+def proxy_image(request):
+    image_url = request.GET.get('url')
+    if not image_url:
+        return HttpResponse('No URL provided', status=400)
+    
+    try:
+        # Fetch image from external source
+        response = requests.get(image_url, timeout=10)
+        response.raise_for_status()
+        
+        # Return the image with proper content type
+        return HttpResponse(
+            response.content,
+            content_type=response.headers.get('Content-Type', 'image/jpeg')
+        )
+    except requests.RequestException as e:
+        return HttpResponse(f'Error fetching image: {str(e)}', status=500)
+    
+@csrf_exempt
+def create_product_flutter(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        title = strip_tags(data.get("title", ""))  # Strip HTML tags
+        content = strip_tags(data.get("content", ""))  # Strip HTML tags
+        name = strip_tags(data.get("name", ""))
+        price = strip_tags(data.get("price", ""))
+        description = strip_tags(data.get("title", ""))
+        rating = strip_tags(data.get("rating", ""))
+        stock = strip_tags(data.get("stock", ""))
+        category = data.get("category", "")
+        thumbnail = data.get("thumbnail", "")
+        is_featured = data.get("is_featured", False)
+        user = request.user
+        
+        new_product = Shop(
+        user=user,
+        name = name,
+        price = price,
+        description = description,
+        thumbnail = thumbnail,
+        category = category,
+        is_featured = is_featured,
+        rating = rating,
+        stock = stock
+        )
+        new_product.save()
+        
+        return JsonResponse({"status": "success"}, status=200)
+    else:
+        return JsonResponse({"status": "error"}, status=401)
 
 @login_required(login_url='/login')
 def show_main(request):
